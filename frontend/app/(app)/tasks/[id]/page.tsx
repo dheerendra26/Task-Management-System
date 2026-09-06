@@ -3368,80 +3368,79 @@ export default function TaskDetailsPage() {
       )}
 
       {isDirty && (
-        <div className="fixed bottom-0 left-0 right-0 z-40 flex h-16 items-center justify-end gap-3 border-t border-border bg-surface px-8 shadow-lg">
-          <span className="mr-3 text-sm text-foreground-secondary">
-            You have unsaved changes
-          </span>
+        <div className="fixed bottom-0 left-0 right-0 z-40 flex flex-col gap-3 border-t border-border bg-surface px-4 py-3 shadow-lg sm:flex-row sm:items-center sm:justify-end sm:px-8">
+          <div className="w-full sm:mr-auto sm:w-auto">
+            <span className="text-sm text-foreground-secondary">
+              You have unsaved changes
+            </span>
+          </div>
 
-          <button
-            type="button"
-            onClick={() => {
-              setIsDirty(false);
-              setSaved(false);
-            }}
-            className="rounded-md border border-border px-4 py-2 text-sm text-foreground hover:bg-surface-secondary"
-          >
-            Discard
-          </button>
+          <div className="flex w-full justify-end gap-3 sm:w-auto">
+            <button
+              type="button"
+              onClick={() => {
+                setIsDirty(false);
+                setSaved(false);
+              }}
+              className="flex-1 rounded-md border border-border px-4 py-2 text-sm text-foreground hover:bg-surface-secondary sm:flex-none"
+            >
+              Discard
+            </button>
 
-          <button
-            type="button"
-            onClick={saveChanges}
-            className="rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background"
-          >
-            Save Changes
-          </button>
+            <button
+              type="button"
+              onClick={saveChanges}
+              className="flex-1 rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background sm:flex-none"
+            >
+              Save Changes
+            </button>
+          </div>
         </div>
       )}
 
       {saved && (
-        <div className="fixed bottom-5 right-5 z-50 rounded-md bg-foreground px-4 py-2 text-sm text-background shadow-lg">
+        <div className="fixed bottom-5 left-4 right-4 z-50 rounded-md bg-foreground px-4 py-3 text-center text-sm text-background shadow-lg sm:left-auto sm:right-5 sm:w-auto">
           Changes saved
         </div>
       )}
 
       {showUnsavedModal && (
-        <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/30">
-          <div className="w-100 rounded-xl bg-surface p-6 text-foreground shadow-2xl">
-            <div className="flex items-start justify-between">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/30 px-4 py-6">
+          <div className="w-full max-w-md rounded-xl bg-surface p-5 text-foreground shadow-2xl sm:p-6">
+            <div className="flex items-start justify-between gap-4">
               <div>
                 <h2 className="text-lg font-semibold">
                   Unsaved changes
                 </h2>
 
                 <p className="mt-2 text-sm leading-5 text-foreground-secondary">
-                  You have made changes to this task. Do you want to save them before closing?
+                  You have made changes to this task. Do you want to save them
+                  before closing?
                 </p>
               </div>
 
               <button
                 type="button"
                 onClick={() =>
-                  setShowUnsavedModal(
-                    false,
-                  )
+                  setShowUnsavedModal(false)
                 }
-                className="rounded-md p-1 text-foreground hover:bg-surface-secondary"
+                className="shrink-0 rounded-md p-1 text-foreground hover:bg-surface-secondary"
               >
                 <X size={18} />
               </button>
             </div>
 
-            <div className="mt-6 flex justify-end gap-2">
+            <div className="mt-6 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
               <button
                 type="button"
                 onClick={() => {
-                  setShowUnsavedModal(
-                    false,
-                  );
+                  setShowUnsavedModal(false);
 
                   setIsDirty(false);
 
-                  router.push(
-                    "/tasks",
-                  );
+                  router.push("/tasks");
                 }}
-                className="rounded-md border border-border px-4 py-2 text-sm text-foreground hover:bg-surface-secondary"
+                className="w-full rounded-md border border-border px-4 py-2 text-sm text-foreground hover:bg-surface-secondary sm:w-auto"
               >
                 Discard
               </button>
@@ -3451,15 +3450,11 @@ export default function TaskDetailsPage() {
                 onClick={async () => {
                   await saveChanges();
 
-                  setShowUnsavedModal(
-                    false,
-                  );
+                  setShowUnsavedModal(false);
 
-                  router.push(
-                    "/tasks",
-                  );
+                  router.push("/tasks");
                 }}
-                className="rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background"
+                className="w-full rounded-md bg-foreground px-4 py-2 text-sm font-medium text-background sm:w-auto"
               >
                 Save Changes
               </button>

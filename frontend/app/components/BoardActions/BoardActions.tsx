@@ -127,7 +127,10 @@ export default function BoardActions({
   };
 
   return (
-    <div className="relative flex flex-wrap items-center gap-2">
+    <div
+      className={`relative flex items-center gap-2 ${isSearchOpen ? "flex-wrap" : "flex-nowrap"
+        }`}
+    >
       {isSearchOpen ? (
         <div className="order-last flex h-9 basis-full items-center gap-1.5 rounded border border-border bg-background px-3 md:order-0 md:h-8 md:w-93.25 md:basis-auto">
           <Search
