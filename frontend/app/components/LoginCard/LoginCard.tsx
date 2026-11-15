@@ -114,7 +114,7 @@ export default function LoginCard() {
           <PyramidMark />
 
           <span className="text-[14px] font-semibold leading-none text-foreground">
-            Pyramid
+            FlowBit
           </span>
         </div>
 
@@ -132,7 +132,7 @@ export default function LoginCard() {
           <div className="overflow-hidden rounded-2xl border border-border shadow-[0_20px_60px_rgba(0,0,0,0.25)]">
             <Image
               src="/Hero-Page.png"
-              alt="Pyramid task board preview"
+              alt="FlowBit task board preview"
               width={3472}
               height={1802}
               className="h-auto w-full"
@@ -150,7 +150,7 @@ export default function LoginCard() {
             <PyramidMark />
 
             <span className="text-[14px] font-semibold leading-none text-foreground">
-              Pyramid
+              FlowBit
             </span>
           </div>
 
