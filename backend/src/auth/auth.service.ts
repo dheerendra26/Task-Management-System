@@ -15,7 +15,6 @@ export class AuthService {
     name: string;
     avatar?: string;
   }) {
-
     let user = await this.usersService.findByGoogleId(profile.googleId);
 
     if (!user) {
@@ -24,6 +23,10 @@ export class AuthService {
 
     if (!user) {
       user = await this.usersService.createGoogleUser(profile);
+    } else if (profile.avatar && user.avatar !== profile.avatar) {
+      user = await this.usersService.update(user.id!, {
+        avatar: profile.avatar,
+      });
     }
 
     const payload = {

@@ -14,7 +14,7 @@ import {
   Settings,
   CheckSquare,
   BriefcaseBusiness,
-  LogIn,
+  LogOut,
   User,
 } from "lucide-react";
 
@@ -39,11 +39,6 @@ const navigation = [
     label: "Projects",
     icon: BriefcaseBusiness,
     route: "/projects",
-  },
-  {
-    label: "Login",
-    icon: LogIn,
-    route: "/login",
   },
 ];
 
@@ -75,7 +70,7 @@ const colorModes = [
 ];
 
 export default function Sidebar({ isOpen, onClose }: SidebarProps) {
-  const { user } = useAuth();
+  const { user, logout } = useAuth();
 
   const [isWorkspaceOpen, setIsWorkspaceOpen] = useState(true);
 
@@ -209,8 +204,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 type="button"
                 onClick={() => router.push("/settings/profile")}
                 className={`flex h-9 w-full items-center gap-2 rounded-md px-3 py-2 text-left transition-colors ${settingsItem === "profile"
-                    ? "bg-(--accent-color) text-(--accent-foreground)"
-                    : "text-foreground hover:bg-surface-secondary"
+                  ? "bg-(--accent-color) text-(--accent-foreground)"
+                  : "text-foreground hover:bg-surface-secondary"
                   }`}
               >
                 <User
@@ -381,6 +376,27 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                       Settings
                     </span>
                   </button>
+                  <div className="my-1 h-px w-full bg-border" />
+
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setIsProfileOpen(false);
+                      setActiveMenu(null);
+                      logout();
+                    }}
+                    className="flex h-9 w-full items-center gap-2 rounded-2xl px-3 py-2 text-red-600 transition-colors hover:bg-red-500/10"
+                  >
+                    <LogOut
+                      size={16}
+                      strokeWidth={2}
+                      className="shrink-0"
+                    />
+
+                    <span className="min-w-0 flex-1 truncate text-left text-sm font-normal leading-5">
+                      Logout
+                    </span>
+                  </button>
                 </div>
               </div>
             )}
@@ -426,8 +442,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                           router.push(item.route);
                         }}
                         className={`flex h-9 w-full items-center gap-2 rounded-xl px-3 py-2 text-left transition-colors ${isActive
-                            ? "bg-(--accent-color) text-(--accent-foreground)"
-                            : "text-foreground hover:bg-surface-secondary"
+                          ? "bg-(--accent-color) text-(--accent-foreground)"
+                          : "text-foreground hover:bg-surface-secondary"
                           }`}
                       >
                         <Icon size={16} strokeWidth={2} />
@@ -447,8 +463,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         {activeMenu === "theme" && (
           <div
             className={`absolute z-60 w-48 rounded-md border border-border bg-surface p-1.5 shadow-[0_4px_12px_rgba(0,0,0,0.12),0_2px_4px_rgba(0,0,0,0.08)] ${isSettingsView
-                ? "left-[calc(100%-80px)] top-37.5 md:left-[calc(100%-80px)] md:top-37.5"
-                : "left-[calc(100%-60px)] top-62.5 md:left-[calc(100%+20px)] md:top-62.5"
+              ? "left-[calc(100%-80px)] top-37.5 md:left-[calc(100%-80px)] md:top-37.5"
+              : "left-[calc(100%-60px)] top-62.5 md:left-[calc(100%+20px)] md:top-62.5"
               }`}
           >
             <div className="flex h-9 items-center px-3 py-2">
@@ -465,8 +481,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 setActiveMenu(null);
               }}
               className={`flex h-9 w-full items-center gap-2 rounded-2xl px-3 py-2 transition-colors ${theme === "light"
-                  ? "bg-(--accent-color) text-(--accent-foreground)"
-                  : "text-foreground hover:bg-surface-secondary"
+                ? "bg-(--accent-color) text-(--accent-foreground)"
+                : "text-foreground hover:bg-surface-secondary"
                 }`}
             >
               <Sun size={16} strokeWidth={2} />
@@ -484,8 +500,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 setActiveMenu(null);
               }}
               className={`flex h-9 w-full items-center gap-2 rounded-2xl px-3 py-2 transition-colors ${theme === "dark"
-                  ? "bg-(--accent-color) text-(--accent-foreground)"
-                  : "text-foreground hover:bg-surface-secondary"
+                ? "bg-(--accent-color) text-(--accent-foreground)"
+                : "text-foreground hover:bg-surface-secondary"
                 }`}
             >
               <Moon size={16} strokeWidth={2} />
@@ -500,8 +516,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
         {activeMenu === "color" && (
           <div
             className={`absolute z-60 w-48 rounded-md border border-border bg-surface p-1.5 shadow-[0_4px_12px_rgba(0,0,0,0.12),0_2px_4px_rgba(0,0,0,0.08)] ${isSettingsView
-                ? "left-[calc(100%-80px)] top-50 md:left-[calc(100%-80px)] md:top-50"
-                : "left-[calc(100%-60px)] top-75 md:left-[calc(100%+20px)] md:top-75"
+              ? "left-[calc(100%-80px)] top-50 md:left-[calc(100%-80px)] md:top-50"
+              : "left-[calc(100%-60px)] top-75 md:left-[calc(100%+20px)] md:top-75"
               }`}
           >
             <div className="flex h-9 items-center px-3 py-2">
@@ -523,8 +539,8 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                     setActiveMenu(null);
                   }}
                   className={`flex h-9 w-full items-center gap-2 rounded-2xl px-3 py-2 transition-colors ${isSelected
-                      ? "bg-(--accent-color) text-(--accent-foreground)"
-                      : "text-foreground hover:bg-surface-secondary"
+                    ? "bg-(--accent-color) text-(--accent-foreground)"
+                    : "text-foreground hover:bg-surface-secondary"
                     }`}
                 >
                   <span
