@@ -1,4 +1,4 @@
-# 📋 Task Management System
+# 📋 Flow-Bit: Task Management System
 
 ![Task Management System](./frontend/public/Hero-Page.png)
 
