@@ -50,9 +50,9 @@ export class Comment {
   @OneToMany(() => Comment, (comment) => comment.parentComment)
   replies: Comment[] | undefined;
 
-  @CreateDateColumn()
+  @CreateDateColumn({ type: 'timestamptz' })
   createdAt: Date | undefined;
 
-  @UpdateDateColumn()
+  @UpdateDateColumn({ type: 'timestamptz' })
   updatedAt: Date | undefined;
 }
