@@ -1274,6 +1274,13 @@ export default function TaskDetailsPage() {
     [],
   );
 
+  const [commentsPage, setCommentsPage] = useState(1);
+  const [hasMoreComments, setHasMoreComments] = useState(false);
+  const [isLoadingMoreComments, setIsLoadingMoreComments] = useState(false);
+
+  const commentsContainerRef = useRef<HTMLDivElement>(null);
+  const isFetchingCommentsRef = useRef(false);
+
   const [
     newComment,
     setNewComment,
@@ -1387,6 +1394,87 @@ export default function TaskDetailsPage() {
   const apiUrl =
     process.env.NEXT_PUBLIC_API_URL;
 
+  const fetchComments = async (
+    page = 1,
+    append = false,
+  ) => {
+    if (isFetchingCommentsRef.current) {
+      return;
+    }
+
+    isFetchingCommentsRef.current = true;
+
+    if (append) {
+      setIsLoadingMoreComments(true);
+    }
+
+    try {
+      const token = localStorage.getItem("accessToken");
+
+      console.log("Comments auth check:", {
+        hasToken: Boolean(token),
+        tokenLength: token?.length,
+      });
+
+      const response = await fetch(
+        `${apiUrl}/tasks/${taskId}/comments?page=${page}&limit=10`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: token ? `Bearer ${token}` : "",
+          },
+        },
+      );
+
+      if (!response.ok) {
+        const errorData = await response.text();
+
+        console.error("Comments API error:", {
+          status: response.status,
+          response: errorData,
+        });
+
+        throw new Error("Failed to fetch comments");
+      }
+
+      const data: {
+        comments: TaskComment[];
+        total: number;
+        hasMore: boolean;
+      } = await response.json();
+
+      setComments((currentComments) => {
+        const mergedComments = append
+          ? [...currentComments, ...data.comments]
+          : data.comments;
+
+        return Array.from(
+          new Map(
+            mergedComments.map((comment) => [
+              comment.id,
+              comment,
+            ]),
+          ).values(),
+        ).sort(
+          (a, b) =>
+            new Date(a.createdAt).getTime() -
+            new Date(b.createdAt).getTime(),
+        );
+      });
+
+      setCommentsPage(page);
+      setHasMoreComments(data.hasMore);
+    } catch (error) {
+      console.error("Failed to fetch comments:", error);
+    } finally {
+      isFetchingCommentsRef.current = false;
+
+      if (append) {
+        setIsLoadingMoreComments(false);
+      }
+    }
+  };
+
   const fetchSubtasks =
     async () => {
       try {
@@ -1429,39 +1517,6 @@ export default function TaskDetailsPage() {
     if (!taskId) {
       return;
     }
-
-    const fetchComments =
-      async () => {
-        try {
-          const token = localStorage.getItem("accessToken");
-
-          const response = await fetch(
-            `${apiUrl}/tasks/${taskId}/comments`,
-            {
-              method: "GET",
-              headers: {
-                Authorization: token ? `Bearer ${token}` : "",
-              },
-            },
-          );
-
-          if (!response.ok) {
-            throw new Error(
-              "Failed to fetch comments",
-            );
-          }
-
-          const data: TaskComment[] =
-            await response.json();
-
-          setComments(data);
-        } catch (error) {
-          console.error(
-            "Failed to fetch comments:",
-            error,
-          );
-        }
-      };
 
     const fetchTask =
       async () => {
@@ -1535,9 +1590,13 @@ export default function TaskDetailsPage() {
 
           setIsDirty(false);
 
+          setComments([]);
+          setCommentsPage(1);
+          setHasMoreComments(false);
+
           await Promise.all([
             fetchSubtasks(),
-            fetchComments(),
+            fetchComments(1, false),
           ]);
         } catch (error) {
           console.error(
@@ -2423,196 +2482,222 @@ export default function TaskDetailsPage() {
                 </h3>
 
                 <div className="space-y-5">
-                  {comments.map(
-                    (comment) => (
-                      <div
-                        key={comment.id}
-                        className="min-h-33.75 overflow-visible rounded-md border border-border bg-background"
-                      >
-                        <div className="min-h-21.5 rounded-t-md border-b border-border p-4">
-                          <div className="flex h-full flex-col gap-2">
-                            <div className="flex h-5.25 items-center justify-between">
-                              <div className="flex items-center gap-2">
-                                <CommentAvatar
-                                  name={
-                                    comment.author
-                                      .name
-                                  }
-                                  avatar={
-                                    comment.author
-                                      .avatar
-                                  }
-                                />
+                  <div
+                    ref={commentsContainerRef}
+                    onScroll={(event) => {
+                      const {
+                        scrollTop,
+                        scrollHeight,
+                        clientHeight,
+                      } = event.currentTarget;
 
-                                <span className="text-xs font-medium text-foreground">
-                                  {
-                                    comment.author
-                                      .name
-                                  }
-                                </span>
+                      if (
+                        scrollHeight - scrollTop - clientHeight < 100 &&
+                        hasMoreComments &&
+                        !isLoadingMoreComments
+                      ) {
+                        fetchComments(commentsPage + 1, true);
+                      }
+                    }}
+                    className="max-h-[700px] space-y-5 overflow-y-auto pr-2"
+                  >
+                    {comments.map(
+                      (comment) => (
+                        <div
+                          key={comment.id}
+                          className="min-h-33.75 overflow-visible rounded-md border border-border bg-background"
+                        >
+                          <div className="min-h-21.5 rounded-t-md border-b border-border p-4">
+                            <div className="flex h-full flex-col gap-2">
+                              <div className="flex h-5.25 items-center justify-between">
+                                <div className="flex items-center gap-2">
+                                  <CommentAvatar
+                                    name={
+                                      comment.author
+                                        .name
+                                    }
+                                    avatar={
+                                      comment.author
+                                        .avatar
+                                    }
+                                  />
+
+                                  <span className="text-xs font-medium text-foreground">
+                                    {
+                                      comment.author
+                                        .name
+                                    }
+                                  </span>
+                                </div>
+
+                                <div className="flex items-center gap-3">
+                                  <span className="text-xs text-foreground-secondary">
+                                    {formatCommentTime(
+                                      comment.createdAt,
+                                    )}
+                                  </span>
+
+                                  <button
+                                    type="button"
+                                    className="flex h-4 w-4 items-center justify-center text-foreground-secondary hover:text-foreground"
+                                    aria-label="Add reaction"
+                                  >
+                                    <SmilePlus
+                                      size={16}
+                                      strokeWidth={1.8}
+                                    />
+                                  </button>
+
+                                  <div className="relative">
+                                    <button
+                                      type="button"
+                                      onClick={() =>
+                                        setCommentMenuId(
+                                          commentMenuId ===
+                                            comment.id
+                                            ? null
+                                            : comment.id,
+                                        )
+                                      }
+                                      className="flex h-5 w-5 items-center justify-center text-foreground"
+                                      aria-label="Comment actions"
+                                    >
+                                      <MoreHorizontal
+                                        size={16}
+                                        strokeWidth={2}
+                                      />
+                                    </button>
+
+                                    {commentMenuId ===
+                                      comment.id && (
+                                        <div className="absolute right-0 top-6 z-20 w-24 rounded-md border border-border bg-surface p-1 shadow-lg">
+                                          <button
+                                            type="button"
+                                            onClick={() =>
+                                              deleteComment(
+                                                comment.id,
+                                              )
+                                            }
+                                            className="flex h-8 w-full items-center rounded px-2 text-xs text-red-500 hover:bg-surface-secondary"
+                                          >
+                                            Delete
+                                          </button>
+                                        </div>
+                                      )}
+                                  </div>
+                                </div>
                               </div>
 
-                              <div className="flex items-center gap-3">
-                                <span className="text-xs text-foreground-secondary">
-                                  {formatCommentTime(
-                                    comment.createdAt,
-                                  )}
-                                </span>
+                              <p className="text-base leading-6 text-foreground">
+                                {comment.content}
+                              </p>
+                            </div>
+                          </div>
+
+                          {comment.replies?.length > 0 && (
+                            <div className="border-b border-border">
+                              {comment.replies.map((reply) => (
+                                <div
+                                  key={reply.id}
+                                  className="ml-8 border-t border-border px-4 py-3"
+                                >
+                                  <div className="flex items-center gap-2">
+                                    <CommentAvatar
+                                      name={reply.author.name}
+                                      avatar={reply.author.avatar}
+                                    />
+
+                                    <span className="text-xs font-medium text-foreground">
+                                      {reply.author.name}
+                                    </span>
+
+                                    <span className="text-xs text-foreground-secondary">
+                                      {formatCommentTime(reply.createdAt)}
+                                    </span>
+                                  </div>
+
+                                  <p className="mt-2 text-sm leading-5 text-foreground">
+                                    {reply.content}
+                                  </p>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+
+                          <div className="px-4 py-3">
+                            {replyingToCommentId === comment.id ? (
+                              <div className="flex items-center gap-2">
+                                <CommentAvatar
+                                  name={user?.name ?? "You"}
+                                  avatar={user?.avatar}
+                                />
+
+                                <input
+                                  type="text"
+                                  autoFocus
+                                  value={replyContent}
+                                  onChange={(event) =>
+                                    setReplyContent(event.target.value)
+                                  }
+                                  onKeyDown={(event) => {
+                                    if (event.key === "Enter") {
+                                      event.preventDefault();
+
+                                      addReply(comment.id);
+                                    }
+
+                                    if (event.key === "Escape") {
+                                      setReplyingToCommentId(null);
+                                      setReplyContent("");
+                                    }
+                                  }}
+                                  placeholder="Write a reply..."
+                                  className="min-w-0 flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-foreground-secondary"
+                                />
 
                                 <button
                                   type="button"
-                                  className="flex h-4 w-4 items-center justify-center text-foreground-secondary hover:text-foreground"
-                                  aria-label="Add reaction"
+                                  onClick={() =>
+                                    addReply(comment.id)
+                                  }
+                                  disabled={!replyContent.trim()}
+                                  className="flex h-8 w-8 items-center justify-center rounded-md text-foreground-secondary hover:bg-surface-secondary hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
                                 >
-                                  <SmilePlus
+                                  <SendHorizontal
                                     size={16}
                                     strokeWidth={1.8}
                                   />
                                 </button>
-
-                                <div className="relative">
-                                  <button
-                                    type="button"
-                                    onClick={() =>
-                                      setCommentMenuId(
-                                        commentMenuId ===
-                                          comment.id
-                                          ? null
-                                          : comment.id,
-                                      )
-                                    }
-                                    className="flex h-5 w-5 items-center justify-center text-foreground"
-                                    aria-label="Comment actions"
-                                  >
-                                    <MoreHorizontal
-                                      size={16}
-                                      strokeWidth={2}
-                                    />
-                                  </button>
-
-                                  {commentMenuId ===
-                                    comment.id && (
-                                      <div className="absolute right-0 top-6 z-20 w-24 rounded-md border border-border bg-surface p-1 shadow-lg">
-                                        <button
-                                          type="button"
-                                          onClick={() =>
-                                            deleteComment(
-                                              comment.id,
-                                            )
-                                          }
-                                          className="flex h-8 w-full items-center rounded px-2 text-xs text-red-500 hover:bg-surface-secondary"
-                                        >
-                                          Delete
-                                        </button>
-                                      </div>
-                                    )}
-                                </div>
                               </div>
-                            </div>
-
-                            <p className="text-base leading-6 text-foreground">
-                              {comment.content}
-                            </p>
-                          </div>
-                        </div>
-
-                        {comment.replies?.length > 0 && (
-                          <div className="border-b border-border">
-                            {comment.replies.map((reply) => (
-                              <div
-                                key={reply.id}
-                                className="ml-8 border-t border-border px-4 py-3"
-                              >
-                                <div className="flex items-center gap-2">
-                                  <CommentAvatar
-                                    name={reply.author.name}
-                                    avatar={reply.author.avatar}
-                                  />
-
-                                  <span className="text-xs font-medium text-foreground">
-                                    {reply.author.name}
-                                  </span>
-
-                                  <span className="text-xs text-foreground-secondary">
-                                    {formatCommentTime(reply.createdAt)}
-                                  </span>
-                                </div>
-
-                                <p className="mt-2 text-sm leading-5 text-foreground">
-                                  {reply.content}
-                                </p>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-
-                        <div className="px-4 py-3">
-                          {replyingToCommentId === comment.id ? (
-                            <div className="flex items-center gap-2">
-                              <CommentAvatar
-                                name={user?.name ?? "You"}
-                                avatar={user?.avatar}
-                              />
-
-                              <input
-                                type="text"
-                                autoFocus
-                                value={replyContent}
-                                onChange={(event) =>
-                                  setReplyContent(event.target.value)
-                                }
-                                onKeyDown={(event) => {
-                                  if (event.key === "Enter") {
-                                    event.preventDefault();
-
-                                    addReply(comment.id);
-                                  }
-
-                                  if (event.key === "Escape") {
-                                    setReplyingToCommentId(null);
-                                    setReplyContent("");
-                                  }
-                                }}
-                                placeholder="Write a reply..."
-                                className="min-w-0 flex-1 bg-transparent text-sm text-foreground outline-none placeholder:text-foreground-secondary"
-                              />
-
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  addReply(comment.id)
-                                }
-                                disabled={!replyContent.trim()}
-                                className="flex h-8 w-8 items-center justify-center rounded-md text-foreground-secondary hover:bg-surface-secondary hover:text-foreground disabled:cursor-not-allowed disabled:opacity-40"
-                              >
-                                <SendHorizontal
-                                  size={16}
-                                  strokeWidth={1.8}
+                            ) : (
+                              <div className="flex h-6 items-center gap-2">
+                                <CommentAvatar
+                                  name={user?.name ?? "You"}
+                                  avatar={user?.avatar}
                                 />
-                              </button>
-                            </div>
-                          ) : (
-                            <div className="flex h-6 items-center gap-2">
-                              <CommentAvatar
-                                name={user?.name ?? "You"}
-                                avatar={user?.avatar}
-                              />
 
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setReplyingToCommentId(comment.id);
-                                  setReplyContent("");
-                                }}
-                                className="text-sm text-neutral-400 transition-colors hover:text-foreground"
-                              >
-                                Leave a reply
-                              </button>
-                            </div>
-                          )}
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setReplyingToCommentId(comment.id);
+                                    setReplyContent("");
+                                  }}
+                                  className="text-sm text-neutral-400 transition-colors hover:text-foreground"
+                                >
+                                  Leave a reply
+                                </button>
+                              </div>
+                            )}
+                          </div>
                         </div>
-                      </div>
-                    ),
+                      ),
+                    )}
+                  </div>
+
+                  {isLoadingMoreComments && (
+                    <p className="py-2 text-center text-xs text-foreground-secondary">
+                      Loading more comments...
+                    </p>
                   )}
 
                   <div className="flex h-16 items-center gap-3 rounded-md border border-border bg-background px-4">

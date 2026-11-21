@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
   Req,
   UseGuards,
 } from '@nestjs/common';
@@ -46,10 +47,15 @@ export class CommentsController {
 
   @Get()
   findAll(
-    @Param('taskId')
-    taskId: string,
+    @Param('taskId') taskId: string,
+    @Query('page') page = '1',
+    @Query('limit') limit = '10',
   ) {
-    return this.commentsService.findAllByTask(taskId);
+    return this.commentsService.findAllByTask(
+      taskId,
+      Number(page),
+      Number(limit),
+    );
   }
 
   @Patch(':commentId')

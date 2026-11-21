@@ -124,7 +124,7 @@ export class CommentsService {
     return createdComment;
   }
 
-  async findAllByTask(taskId: string) {
+  async findAllByTask(taskId: string, page = 1, limit = 10) {
     const task = await this.taskRepository.findOne({
       where: {
         id: taskId,
@@ -135,7 +135,10 @@ export class CommentsService {
       throw new NotFoundException('Task not found');
     }
 
-    return this.commentRepository.find({
+    const currentPage = Math.max(1, page);
+    const pageSize = Math.min(10, Math.max(1, limit));
+
+    const [comments, total] = await this.commentRepository.findAndCount({
       where: {
         task: {
           id: taskId,
@@ -154,24 +157,23 @@ export class CommentsService {
           createdAt: 'ASC',
         },
       },
+      skip: (currentPage - 1) * pageSize,
+      take: pageSize,
       select: {
         id: true,
         content: true,
         createdAt: true,
         updatedAt: true,
-
         author: {
           id: true,
           name: true,
           avatar: true,
         },
-
         replies: {
           id: true,
           content: true,
           createdAt: true,
           updatedAt: true,
-
           author: {
             id: true,
             name: true,
@@ -180,6 +182,12 @@ export class CommentsService {
         },
       },
     });
+
+    return {
+      comments,
+      total,
+      hasMore: currentPage * pageSize < total,
+    };
   }
 
   async update(
