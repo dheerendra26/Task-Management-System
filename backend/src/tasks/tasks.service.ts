@@ -181,10 +181,11 @@ export class TasksService {
       .leftJoinAndSelect('task.project', 'project')
       .leftJoinAndSelect('task.assignee', 'assignee')
       .leftJoinAndSelect('task.members', 'members')
+      .leftJoin('task.members', 'taskMemberFilter')
       .leftJoinAndSelect('task.parentTask', 'parentTask')
       .leftJoinAndSelect('task.labels', 'labels')
       .where('task.parentTask IS NULL')
-      .andWhere('(assignee.id = :userId OR members.id = :userId)', {
+      .andWhere('(assignee.id = :userId OR taskMemberFilter.id = :userId)', {
         userId,
       });
 
