@@ -2499,7 +2499,7 @@ export default function TaskDetailsPage() {
                         fetchComments(commentsPage + 1, true);
                       }
                     }}
-                    className="max-h-[700px] space-y-5 overflow-y-auto pr-2"
+                    className="max-h-[700px] space-y-5 overflow-y-auto pr-2 scrollbar-hide"
                   >
                     {comments.map(
                       (comment) => (
