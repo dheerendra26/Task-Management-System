@@ -39,7 +39,7 @@ const colorModes: Record<ColorMode, string> = {
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>("light");
-  const [colorMode, setColorModeState] = useState<ColorMode>("Blue");
+  const [colorMode, setColorModeState] = useState<ColorMode>("Black");
 
   const applyTheme = useCallback(
     (selectedTheme: Theme, selectedColor: ColorMode) => {
@@ -55,6 +55,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
       }
 
       root.setAttribute("data-theme", resolvedTheme);
+      root.setAttribute("data-color", selectedColor);
       root.style.setProperty("--accent-color", colorModes[selectedColor]);
     },
     [],
