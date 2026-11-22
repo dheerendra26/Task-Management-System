@@ -1,5 +1,7 @@
 "use client";
 
+import { apiRequest } from "@/lib/api";
+
 import { useEffect, useState } from "react";
 
 import { useRouter } from "next/navigation";
@@ -154,8 +156,8 @@ export default function ProfilePage() {
         return;
       }
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/users/${user.id}`,
+      const response = await apiRequest(
+        `/users/${user.id}`,
         {
           method: "PATCH",
           headers: {
@@ -170,9 +172,9 @@ export default function ProfilePage() {
         },
       );
 
-      const data = await response.json();
+      const data = response.data;
 
-      if (!response.ok) {
+      if (!(response.status >= 200 && response.status < 300)) {
         throw new Error(data?.message || "Failed to save profile");
       }
 

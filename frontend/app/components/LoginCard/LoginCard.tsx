@@ -1,5 +1,7 @@
 "use client";
 
+import { apiRequest } from "@/lib/api";
+
 import { useEffect, useState } from "react";
 
 import Image from "next/image";
@@ -65,7 +67,7 @@ export default function LoginCard() {
   }, [router]);
 
   const handleGoogleLogin = () => {
-    window.location.href = `${process.env.NEXT_PUBLIC_API_URL}/auth/google`;
+    window.location.href = "/api/auth/google";
   };
 
   const handleGuestLogin = async () => {
@@ -73,19 +75,19 @@ export default function LoginCard() {
     setIsGuestLoading(true);
 
     try {
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/auth/guest`,
+      const response = await apiRequest(
+        `/auth/guest`,
         {
           method: "POST",
         },
       );
 
-      if (!response.ok) {
+      if (!(response.status >= 200 && response.status < 300)) {
         setError("Something went wrong. Please try again.");
         return;
       }
 
-      const data = await response.json();
+      const data = response.data;
 
       localStorage.setItem("accessToken", data.accessToken);
 

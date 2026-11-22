@@ -1,5 +1,7 @@
 "use client";
 
+import { apiRequest } from "@/lib/api";
+
 import { useState } from "react";
 import {
   Calendar,
@@ -91,26 +93,23 @@ export default function AddProjectModal({
       setIsSubmitting(true);
       setError("");
 
-      const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/projects`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            name: title.trim(),
-            description: description.trim() || undefined,
-            priority,
-            dueDate: dueDate || undefined,
-            ownerId: user.id,
-          }),
+      const response = await apiRequest(`/projects`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
-      );
+        body: JSON.stringify({
+          name: title.trim(),
+          description: description.trim() || undefined,
+          priority,
+          dueDate: dueDate || undefined,
+          ownerId: user.id,
+        }),
+      });
 
-      const data = await response.json();
+      const data = response.data;
 
-      if (!response.ok) {
+      if (!(response.status >= 200 && response.status < 300)) {
         throw new Error(data.message || "Failed to create project");
       }
 

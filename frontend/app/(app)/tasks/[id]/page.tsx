@@ -1,5 +1,7 @@
 "use client";
 
+import { apiRequest } from "@/lib/api";
+
 import {
   useEffect,
   useLayoutEffect,
@@ -1401,9 +1403,6 @@ export default function TaskDetailsPage() {
     setMembers,
   ] = useState<Assignee[]>([]);
 
-  const apiUrl =
-    process.env.NEXT_PUBLIC_API_URL;
-
   const fetchComments = async (
     page = 1,
     append = false,
@@ -1426,8 +1425,8 @@ export default function TaskDetailsPage() {
         tokenLength: token?.length,
       });
 
-      const response = await fetch(
-        `${apiUrl}/tasks/${taskId}/comments?page=${page}&limit=10`,
+      const response = await apiRequest(
+        `/tasks/${taskId}/comments?page=${page}&limit=10`,
         {
           method: "GET",
           headers: {
@@ -1436,8 +1435,8 @@ export default function TaskDetailsPage() {
         },
       );
 
-      if (!response.ok) {
-        const errorData = await response.text();
+      if (!(response.status >= 200 && response.status < 300)) {
+        const errorData = typeof response.data === "string" ? response.data : JSON.stringify(response.data);
 
         console.error("Comments API error:", {
           status: response.status,
@@ -1451,7 +1450,7 @@ export default function TaskDetailsPage() {
         comments: TaskComment[];
         total: number;
         hasMore: boolean;
-      } = await response.json();
+      } = response.data;
 
       setComments((currentComments) => {
         const mergedComments = append
@@ -1489,11 +1488,11 @@ export default function TaskDetailsPage() {
     async () => {
       try {
         const response =
-          await fetch(
-            `${apiUrl}/tasks/${taskId}/subtasks`,
+          await apiRequest(
+            `/tasks/${taskId}/subtasks`,
           );
 
-        if (!response.ok) {
+        if (!(response.status >= 200 && response.status < 300)) {
           throw new Error(
             "Failed to fetch subtasks",
           );
@@ -1501,7 +1500,7 @@ export default function TaskDetailsPage() {
 
         const data:
           BackendTask[] =
-          await response.json();
+          response.data;
 
         setSubtasks(data);
       } catch (error) {
@@ -1534,11 +1533,11 @@ export default function TaskDetailsPage() {
           setIsLoading(true);
 
           const response =
-            await fetch(
-              `${apiUrl}/tasks/${taskId}`,
+            await apiRequest(
+              `/tasks/${taskId}`,
             );
 
-          if (!response.ok) {
+          if (!(response.status >= 200 && response.status < 300)) {
             throw new Error(
               "Failed to fetch task",
             );
@@ -1546,7 +1545,7 @@ export default function TaskDetailsPage() {
 
           const task:
             BackendTask =
-            await response.json();
+            response.data;
 
           setTitle(
             task.title,
@@ -1801,8 +1800,8 @@ export default function TaskDetailsPage() {
         };
 
         const response =
-          await fetch(
-            `${apiUrl}/tasks/${taskId}`,
+          await apiRequest(
+            `/tasks/${taskId}`,
             {
               method: "PATCH",
               headers: {
@@ -1815,7 +1814,7 @@ export default function TaskDetailsPage() {
             },
           );
 
-        if (!response.ok) {
+        if (!(response.status >= 200 && response.status < 300)) {
           throw new Error(
             "Failed to update task",
           );
@@ -1861,8 +1860,8 @@ export default function TaskDetailsPage() {
           newSubtaskDueDate || null,
       };
 
-      const response = await fetch(
-        `${apiUrl}/tasks/${taskId}/subtasks`,
+      const response = await apiRequest(
+        `/tasks/${taskId}/subtasks`,
         {
           method: "POST",
           headers: {
@@ -1878,7 +1877,7 @@ export default function TaskDetailsPage() {
         },
       );
 
-      if (!response.ok) {
+      if (!(response.status >= 200 && response.status < 300)) {
         throw new Error(
           "Failed to create subtask",
         );
@@ -1912,8 +1911,8 @@ export default function TaskDetailsPage() {
     ) => {
       try {
         const response =
-          await fetch(
-            `${apiUrl}/tasks/${subtaskId}`,
+          await apiRequest(
+            `/tasks/${subtaskId}`,
             {
               method: "PATCH",
               headers: {
@@ -1926,7 +1925,7 @@ export default function TaskDetailsPage() {
             },
           );
 
-        if (!response.ok) {
+        if (!(response.status >= 200 && response.status < 300)) {
           throw new Error(
             "Failed to update subtask",
           );
@@ -1947,14 +1946,14 @@ export default function TaskDetailsPage() {
     ) => {
       try {
         const response =
-          await fetch(
-            `${apiUrl}/tasks/${subtaskId}`,
+          await apiRequest(
+            `/tasks/${subtaskId}`,
             {
               method: "DELETE",
             },
           );
 
-        if (!response.ok) {
+        if (!(response.status >= 200 && response.status < 300)) {
           throw new Error(
             "Failed to delete subtask",
           );
@@ -1984,8 +1983,8 @@ export default function TaskDetailsPage() {
 
       try {
         const response =
-          await fetch(
-            `${apiUrl}/tasks/${taskId}/comments`,
+          await apiRequest(
+            `/tasks/${taskId}/comments`,
             {
               method: "POST",
               headers: {
@@ -2001,7 +2000,7 @@ export default function TaskDetailsPage() {
             },
           );
 
-        if (!response.ok) {
+        if (!(response.status >= 200 && response.status < 300)) {
           throw new Error(
             "Failed to add comment",
           );
@@ -2009,7 +2008,7 @@ export default function TaskDetailsPage() {
 
         const createdComment:
           TaskComment =
-          await response.json();
+          response.data;
 
         setComments((currentComments) => {
           const alreadyExists = currentComments.some(
@@ -2042,8 +2041,8 @@ export default function TaskDetailsPage() {
     ) => {
       try {
         const response =
-          await fetch(
-            `${apiUrl}/tasks/${taskId}/comments/${commentId}`,
+          await apiRequest(
+            `/tasks/${taskId}/comments/${commentId}`,
             {
               method: "DELETE",
               credentials: "include",
@@ -2054,7 +2053,7 @@ export default function TaskDetailsPage() {
             },
           );
 
-        if (!response.ok) {
+        if (!(response.status >= 200 && response.status < 300)) {
           throw new Error(
             "Failed to delete comment",
           );
@@ -2090,8 +2089,8 @@ export default function TaskDetailsPage() {
     }
 
     try {
-      const response = await fetch(
-        `${apiUrl}/tasks/${taskId}/comments/${commentId}/replies`,
+      const response = await apiRequest(
+        `/tasks/${taskId}/comments/${commentId}/replies`,
         {
           method: "POST",
           headers: {
@@ -2107,8 +2106,8 @@ export default function TaskDetailsPage() {
         },
       );
 
-      if (!response.ok) {
-        const errorData = await response.json();
+      if (!(response.status >= 200 && response.status < 300)) {
+        const errorData = response.data;
 
         console.error(
           "Failed to add reply:",
@@ -2122,7 +2121,7 @@ export default function TaskDetailsPage() {
       }
 
       const createdReply: CommentReply =
-        await response.json();
+        response.data;
 
       setComments((currentComments) =>
         currentComments.map((comment) => {

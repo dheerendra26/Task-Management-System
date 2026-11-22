@@ -1,5 +1,7 @@
 "use client";
 
+import { apiRequest } from "@/lib/api";
+
 import { useEffect, useState } from "react";
 
 import { ChevronRight, PanelLeft } from "lucide-react";
@@ -46,15 +48,15 @@ export default function TopBar({
         if (isTaskDetails) {
           const taskId = pathParts[1];
 
-          const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/tasks/${taskId}`,
+          const response = await apiRequest(
+            `/tasks/${taskId}`,
           );
 
-          if (!response.ok) {
+          if (!(response.status >= 200 && response.status < 300)) {
             return;
           }
 
-          const task: TaskResponse = await response.json();
+          const task: TaskResponse = response.data;
 
           setSection("Tasks");
           setTitle(task.title);
@@ -65,15 +67,15 @@ export default function TopBar({
         if (isProjectDetails) {
           const projectId = pathParts[1];
 
-          const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/projects/${projectId}`,
+          const response = await apiRequest(
+            `/projects/${projectId}`,
           );
 
-          if (!response.ok) {
+          if (!(response.status >= 200 && response.status < 300)) {
             return;
           }
 
-          const project: ProjectResponse = await response.json();
+          const project: ProjectResponse = response.data;
 
           setSection("Projects");
           setTitle(project.name);

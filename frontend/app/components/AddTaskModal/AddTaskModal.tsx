@@ -1,5 +1,7 @@
 "use client";
 
+import { apiRequest } from "@/lib/api";
+
 import { useEffect, useState } from "react";
 
 import {
@@ -218,8 +220,8 @@ export default function AddTaskModal({
         setMembersLoading(true);
         setMembersError("");
 
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/users`,
+        const response = await apiRequest(
+          `/users`,
           {
             headers: {
               Authorization: `Bearer ${localStorage.getItem("accessToken") ?? ""}`,
@@ -227,9 +229,9 @@ export default function AddTaskModal({
           },
         );
 
-        const data = await response.json();
+        const data = response.data;
 
-        if (!response.ok) {
+        if (!(response.status >= 200 && response.status < 300)) {
           throw new Error(data?.message || "Failed to load members");
         }
 
@@ -396,7 +398,7 @@ export default function AddTaskModal({
       setIsSubmitting(true);
       setError("");
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/tasks`, {
+      const response = await apiRequest(`/tasks`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -415,9 +417,9 @@ export default function AddTaskModal({
         }),
       });
 
-      const data: BackendCreatedTask = await response.json();
+      const data: BackendCreatedTask = response.data;
 
-      if (!response.ok) {
+      if (!(response.status >= 200 && response.status < 300)) {
         throw new Error(
           (
             data as unknown as {

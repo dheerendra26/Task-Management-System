@@ -1,5 +1,7 @@
 "use client";
 
+import { apiRequest } from "@/lib/api";
+
 import {
   createContext,
   useContext,
@@ -31,7 +33,6 @@ type AuthContextType = {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -47,19 +48,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
 
     try {
-      const response = await fetch(`${API_URL}/auth/me`, {
+      const response = await apiRequest("/auth/me", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
 
-      if (!response.ok) {
+      if (!(response.status >= 200 && response.status < 300)) {
         localStorage.removeItem("accessToken");
         setUser(null);
         return;
       }
 
-      const data = await response.json();
+      const data = response.data;
       setUser(data);
     } catch {
       localStorage.removeItem("accessToken");

@@ -1,5 +1,7 @@
 "use client";
 
+import { apiRequest } from "@/lib/api";
+
 import {
   useEffect,
   useLayoutEffect,
@@ -2099,8 +2101,8 @@ export default function TaskBoard() {
       async () => {
         try {
           const response =
-            await fetch(
-              `${process.env.NEXT_PUBLIC_API_URL}/tasks?limit=100`,
+            await apiRequest(
+              `/tasks?limit=100`,
               {
                 headers: {
                   Authorization:
@@ -2109,7 +2111,7 @@ export default function TaskBoard() {
               },
             );
 
-          if (!response.ok) {
+          if (!(response.status >= 200 && response.status < 300)) {
             throw new Error(
               "Failed to fetch tasks",
             );
@@ -2120,7 +2122,7 @@ export default function TaskBoard() {
             | {
               data: BackendTask[];
             } =
-            await response.json();
+            response.data;
 
           const tasks =
             Array.isArray(result)
@@ -2189,8 +2191,8 @@ export default function TaskBoard() {
       async () => {
         try {
           const response =
-            await fetch(
-              `${process.env.NEXT_PUBLIC_API_URL}/projects/owner/${user.id}`,
+            await apiRequest(
+              `/projects/owner/${user.id}`,
               {
                 headers: {
                   Authorization:
@@ -2199,7 +2201,7 @@ export default function TaskBoard() {
               },
             );
 
-          if (!response.ok) {
+          if (!(response.status >= 200 && response.status < 300)) {
             throw new Error(
               "Failed to fetch projects",
             );
@@ -2207,7 +2209,7 @@ export default function TaskBoard() {
 
           const projects:
             BackendProject[] =
-            await response.json();
+            response.data;
 
           if (
             projects.length > 0
@@ -2476,8 +2478,8 @@ export default function TaskBoard() {
               };
 
               const response =
-                await fetch(
-                  `${process.env.NEXT_PUBLIC_API_URL}/tasks/${taskId}`,
+                await apiRequest(
+                  `/tasks/${taskId}`,
                   {
                     method: "PATCH",
                     headers: {
@@ -2494,7 +2496,7 @@ export default function TaskBoard() {
                 );
 
               if (
-                !response.ok
+                !(response.status >= 200 && response.status < 300)
               ) {
                 throw new Error(
                   "Failed to update task",

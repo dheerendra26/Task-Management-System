@@ -1,5 +1,7 @@
 "use client";
 
+import { apiRequest } from "@/lib/api";
+
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 
 import { createPortal } from "react-dom";
@@ -516,15 +518,15 @@ export default function ProjectBoard() {
 
     const fetchProjects = async () => {
       try {
-        const response = await fetch(
-          `${process.env.NEXT_PUBLIC_API_URL}/projects/owner/${user.id}`,
+        const response = await apiRequest(
+          `/projects/owner/${user.id}`,
         );
 
-        if (!response.ok) {
+        if (!(response.status >= 200 && response.status < 300)) {
           throw new Error("Failed to fetch projects");
         }
 
-        const data: BackendProject[] = await response.json();
+        const data: BackendProject[] = response.data;
 
         const formattedProjects: Project[] = data.map((project) => ({
           id: project.id,
@@ -593,8 +595,8 @@ export default function ProjectBoard() {
 
       await Promise.all(
         changedProjects.map(async (project) => {
-          const response = await fetch(
-            `${process.env.NEXT_PUBLIC_API_URL}/projects/${project.id}`,
+          const response = await apiRequest(
+            `/projects/${project.id}`,
             {
               method: "PATCH",
               headers: {
@@ -606,7 +608,7 @@ export default function ProjectBoard() {
             },
           );
 
-          if (!response.ok) {
+          if (!(response.status >= 200 && response.status < 300)) {
             throw new Error(`Failed to update project ${project.id}`);
           }
         }),
