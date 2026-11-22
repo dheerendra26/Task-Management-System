@@ -2784,376 +2784,422 @@ export default function TaskDetailsPage() {
                   </div>
                 </div>
 
-                <div
-                  className={`grid transition-[grid-template-rows,opacity] duration-500 ease-in-out ${showDetails
-                    ? "grid-rows-[1fr] opacity-100"
-                    : "grid-rows-[0fr] opacity-0"
-                    }`}
-                >
-                  <div className="min-h-0 overflow-hidden">
-                    <div className="mt-5 space-y-5">
-                      <div className="grid grid-cols-[90px_1fr] items-center">
-                        <span className="text-xs text-foreground-secondary">
-                          Status
-                        </span>
+                {showDetails && (
+                  <div className="mt-5 space-y-5">
+                    <div className="grid grid-cols-[90px_1fr] items-center">
+                      <span className="text-xs text-foreground-secondary">
+                        Status
+                      </span>
 
-                        <span className="flex items-center gap-1 text-xs font-medium text-orange-500">
-                          <Circle
-                            size={12}
-                            fill="currentColor"
-                          />
+                      <span className="flex items-center gap-1 text-xs font-medium text-orange-500">
+                        <Circle
+                          size={12}
+                          fill="currentColor"
+                        />
 
-                          {
-                            statusLabels[
-                            status
-                            ]
+                        {
+                          statusLabels[
+                          status
+                          ]
+                        }
+                      </span>
+                    </div>
+
+                    <div className="relative grid grid-cols-[90px_1fr] items-center">
+                      <span className="text-xs text-foreground-secondary">
+                        Priority
+                      </span>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setShowPriorityMenu(
+                            !showPriorityMenu,
+                          )
+                        }
+                        className="flex items-center gap-1 text-xs font-medium text-foreground"
+                      >
+                        <PriorityBadge
+                          priority={
+                            priority
                           }
-                        </span>
-                      </div>
+                        />
 
-                      <div className="relative grid grid-cols-[90px_1fr] items-center">
-                        <span className="text-xs text-foreground-secondary">
-                          Priority
-                        </span>
+                        <ChevronDown
+                          size={12}
+                        />
+                      </button>
 
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setShowPriorityMenu(
-                              !showPriorityMenu,
-                            )
-                          }
-                          className="flex items-center gap-1 text-xs font-medium text-foreground"
-                        >
-                          <PriorityBadge
-                            priority={
-                              priority
-                            }
-                          />
+                      {showPriorityMenu && (
+                        <div className="absolute right-0 top-7 z-50 w-52 rounded-lg border border-border bg-surface p-2 text-foreground shadow-lg">
+                          <p className="px-2 py-2 text-xs text-foreground-secondary">
+                            Priority
+                          </p>
 
-                          <ChevronDown
-                            size={12}
-                          />
-                        </button>
-
-                        {showPriorityMenu && (
-                          <div className="absolute right-0 top-7 z-50 w-52 rounded-lg border border-border bg-surface p-2 text-foreground shadow-lg">
-                            <p className="px-2 py-2 text-xs text-foreground-secondary">
-                              Priority
-                            </p>
-
-                            {(
-                              [
-                                "No Priority",
-                                "Urgent",
-                                "High",
-                                "Medium",
-                                "Low",
-                              ] as Priority[]
-                            ).map(
-                              (item) => (
-                                <button
-                                  key={item}
-                                  type="button"
-                                  onClick={() => {
-                                    updateField(
-                                      () =>
-                                        setPriority(
-                                          item,
-                                        ),
-                                    );
-
-                                    setShowPriorityMenu(
-                                      false,
-                                    );
-                                  }}
-                                  className="flex w-full items-center justify-between rounded-md px-2 py-2 text-left text-sm hover:bg-surface-secondary"
-                                >
-                                  <PriorityBadge
-                                    priority={
-                                      item
-                                    }
-                                  />
-
-                                  {priority ===
-                                    item && (
-                                      <span>
-                                        ✓
-                                      </span>
-                                    )}
-                                </button>
-                              ),
-                            )}
-                          </div>
-                        )}
-                      </div>
-
-                      <div className="grid grid-cols-[90px_1fr] items-center">
-                        <span className="text-xs text-foreground-secondary">
-                          Members
-                        </span>
-
-                        {members.length > 0 ? (
-                          <div className="flex items-center">
-                            {members.map(
-                              (member, index) => (
-                                <div
-                                  key={member.id}
-                                  title={member.name}
-                                  className={`group relative ${index > 0
-                                    ? "-ml-2"
-                                    : ""
-                                    }`}
-                                >
-                                  {member.avatar ? (
-                                    <img
-                                      src={member.avatar}
-                                      alt={toTitleCase(member.name)}
-                                      className="h-7 w-7 rounded-full border-2 border-surface object-cover"
-                                    />
-                                  ) : (
-                                    <div className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-surface bg-primary-muted text-[10px] font-medium text-primary">
-                                      {member.name
-                                        .charAt(0)
-                                        .toUpperCase()}
-                                    </div>
-                                  )}
-
-                                  <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded-md bg-foreground px-2 py-1 text-xs text-background shadow-lg group-hover:block">
-                                    {toTitleCase(member.name)}
-                                  </div>
-                                </div>
-                              ),
-                            )}
-                          </div>
-                        ) : (
-                          <span className="flex items-center gap-2 text-xs text-foreground-secondary">
-                            <UserRound size={14} />
-
-                            No members
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="relative grid grid-cols-[90px_1fr] items-center">
-                        <span className="text-xs text-foreground-secondary">
-                          Due Date
-                        </span>
-
-                        <button
-                          type="button"
-                          onClick={() =>
-                            setShowDueDateMenu(
-                              !showDueDateMenu,
-                            )
-                          }
-                          className="flex w-fit items-center gap-1 rounded-full border border-border px-2 py-1 text-xs text-foreground hover:bg-surface-secondary"
-                        >
-                          <Calendar
-                            size={12}
-                          />
-
-                          {dueDate
-                            ? formatDate(dueDate)
-                            : "No due date"}
-
-                          <ChevronDown
-                            size={12}
-                          />
-                        </button>
-
-                        {showDueDateMenu && (
-                          <div className="absolute right-0 top-8 z-50 w-75 rounded-lg border border-border bg-surface p-3 shadow-lg">
-                            <div className="flex items-center justify-between">
+                          {(
+                            [
+                              "No Priority",
+                              "Urgent",
+                              "High",
+                              "Medium",
+                              "Low",
+                            ] as Priority[]
+                          ).map(
+                            (item) => (
                               <button
+                                key={item}
                                 type="button"
-                                onClick={() =>
-                                  setCalendarDate(
-                                    new Date(
-                                      calendarDate.getFullYear(),
-                                      calendarDate.getMonth() - 1,
-                                      1,
-                                    ),
-                                  )
-                                }
-                                className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-surface-secondary"
-                              >
-                                <ChevronRight
-                                  size={16}
-                                  className="rotate-180"
-                                />
-                              </button>
-
-                              <span className="text-sm font-medium text-foreground">
-                                {calendarDate.toLocaleDateString(
-                                  "en-US",
-                                  {
-                                    month: "long",
-                                    year: "numeric",
-                                  },
-                                )}
-                              </span>
-
-                              <button
-                                type="button"
-                                onClick={() =>
-                                  setCalendarDate(
-                                    new Date(
-                                      calendarDate.getFullYear(),
-                                      calendarDate.getMonth() + 1,
-                                      1,
-                                    ),
-                                  )
-                                }
-                                className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-surface-secondary"
-                              >
-                                <ChevronRight
-                                  size={16}
-                                />
-                              </button>
-                            </div>
-
-                            <div className="mt-3 grid grid-cols-7 text-center">
-                              {[
-                                "Sun",
-                                "Mon",
-                                "Tue",
-                                "Wed",
-                                "Thu",
-                                "Fri",
-                                "Sat",
-                              ].map((day) => (
-                                <span
-                                  key={day}
-                                  className="py-2 text-[10px] font-medium text-foreground-secondary"
-                                >
-                                  {day}
-                                </span>
-                              ))}
-
-                              {getCalendarDays(
-                                calendarDate.getFullYear(),
-                                calendarDate.getMonth(),
-                              ).map(
-                                (
-                                  {
-                                    date,
-                                    currentMonth,
-                                  },
-                                  index,
-                                ) => {
-                                  const selectedDate =
-                                    dueDate
-                                      ? new Date(
-                                        `${toInputDate(
-                                          dueDate,
-                                        )}T00:00:00`,
-                                      )
-                                      : null;
-
-                                  const isSelected =
-                                    selectedDate &&
-                                    isSameDate(
-                                      date,
-                                      selectedDate,
-                                    );
-
-                                  const isToday =
-                                    isSameDate(
-                                      date,
-                                      new Date(),
-                                    );
-
-                                  return (
-                                    <button
-                                      key={`${date.toISOString()}-${index}`}
-                                      type="button"
-                                      onClick={() => {
-                                        const selected =
-                                          `${date.getFullYear()}-${String(
-                                            date.getMonth() + 1,
-                                          ).padStart(
-                                            2,
-                                            "0",
-                                          )}-${String(
-                                            date.getDate(),
-                                          ).padStart(
-                                            2,
-                                            "0",
-                                          )}`;
-
-                                        updateField(() =>
-                                          setDueDate(
-                                            selected,
-                                          ),
-                                        );
-
-                                        setManualDueDate(
-                                          formatManualDate(
-                                            selected,
-                                          ),
-                                        );
-
-                                        setDueDateError(
-                                          "",
-                                        );
-                                      }}
-                                      className={`mx-auto flex h-8 w-8 items-center justify-center rounded-md text-xs transition-colors ${!currentMonth
-                                        ? "text-foreground-secondary opacity-40"
-                                        : "text-foreground"
-                                        } ${isSelected
-                                          ? "bg-primary text-white"
-                                          : "hover:bg-surface-secondary"
-                                        } ${isToday &&
-                                          !isSelected
-                                          ? "border border-primary"
-                                          : ""
-                                        }`}
-                                    >
-                                      {date.getDate()}
-                                    </button>
-                                  );
-                                },
-                              )}
-                            </div>
-
-                            <div className="mt-4 border-t border-border pt-3">
-                              <label className="mb-1.5 block text-xs text-foreground-secondary">
-                                Enter date manually
-                              </label>
-
-                              <input
-                                type="text"
-                                value={manualDueDate}
-                                onChange={(event) => {
-                                  setManualDueDate(
-                                    event.target.value,
+                                onClick={() => {
+                                  updateField(
+                                    () =>
+                                      setPriority(
+                                        item,
+                                      ),
                                   );
 
-                                  setDueDateError(
-                                    "",
+                                  setShowPriorityMenu(
+                                    false,
                                   );
                                 }}
-                                onBlur={() => {
-                                  if (
-                                    !manualDueDate.trim()
-                                  ) {
-                                    return;
+                                className="flex w-full items-center justify-between rounded-md px-2 py-2 text-left text-sm hover:bg-surface-secondary"
+                              >
+                                <PriorityBadge
+                                  priority={
+                                    item
                                   }
+                                />
 
-                                  const parsedDate =
-                                    parseManualDate(
+                                {priority ===
+                                  item && (
+                                    <span>
+                                      ✓
+                                    </span>
+                                  )}
+                              </button>
+                            ),
+                          )}
+                        </div>
+                      )}
+                    </div>
+
+                    <div className="grid grid-cols-[90px_1fr] items-center">
+                      <span className="text-xs text-foreground-secondary">
+                        Members
+                      </span>
+
+                      {members.length > 0 ? (
+                        <div className="flex items-center">
+                          {members.map(
+                            (member, index) => (
+                              <div
+                                key={member.id}
+                                title={member.name}
+                                className={`group relative ${index > 0
+                                  ? "-ml-2"
+                                  : ""
+                                  }`}
+                              >
+                                {member.avatar ? (
+                                  <img
+                                    src={member.avatar}
+                                    alt={toTitleCase(member.name)}
+                                    className="h-7 w-7 rounded-full border-2 border-surface object-cover"
+                                  />
+                                ) : (
+                                  <div className="flex h-7 w-7 items-center justify-center rounded-full border-2 border-surface bg-primary-muted text-[10px] font-medium text-primary">
+                                    {member.name
+                                      .charAt(0)
+                                      .toUpperCase()}
+                                  </div>
+                                )}
+
+                                <div className="pointer-events-none absolute bottom-full left-1/2 z-50 mb-2 hidden -translate-x-1/2 whitespace-nowrap rounded-md bg-foreground px-2 py-1 text-xs text-background shadow-lg group-hover:block">
+                                  {toTitleCase(member.name)}
+                                </div>
+                              </div>
+                            ),
+                          )}
+                        </div>
+                      ) : (
+                        <span className="flex items-center gap-2 text-xs text-foreground-secondary">
+                          <UserRound size={14} />
+
+                          No members
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="relative grid grid-cols-[90px_1fr] items-center">
+                      <span className="text-xs text-foreground-secondary">
+                        Due Date
+                      </span>
+
+                      <button
+                        type="button"
+                        onClick={() =>
+                          setShowDueDateMenu(
+                            !showDueDateMenu,
+                          )
+                        }
+                        className="flex w-fit items-center gap-1 rounded-full border border-border px-2 py-1 text-xs text-foreground hover:bg-surface-secondary"
+                      >
+                        <Calendar
+                          size={12}
+                        />
+
+                        {dueDate
+                          ? formatDate(dueDate)
+                          : "No due date"}
+
+                        <ChevronDown
+                          size={12}
+                        />
+                      </button>
+
+                      {showDueDateMenu && (
+                        <div className="absolute right-0 top-8 z-50 w-75 rounded-lg border border-border bg-surface p-3 shadow-lg">
+                          <div className="flex items-center justify-between">
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setCalendarDate(
+                                  new Date(
+                                    calendarDate.getFullYear(),
+                                    calendarDate.getMonth() - 1,
+                                    1,
+                                  ),
+                                )
+                              }
+                              className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-surface-secondary"
+                            >
+                              <ChevronRight
+                                size={16}
+                                className="rotate-180"
+                              />
+                            </button>
+
+                            <span className="text-sm font-medium text-foreground">
+                              {calendarDate.toLocaleDateString(
+                                "en-US",
+                                {
+                                  month: "long",
+                                  year: "numeric",
+                                },
+                              )}
+                            </span>
+
+                            <button
+                              type="button"
+                              onClick={() =>
+                                setCalendarDate(
+                                  new Date(
+                                    calendarDate.getFullYear(),
+                                    calendarDate.getMonth() + 1,
+                                    1,
+                                  ),
+                                )
+                              }
+                              className="flex h-8 w-8 items-center justify-center rounded-md hover:bg-surface-secondary"
+                            >
+                              <ChevronRight
+                                size={16}
+                              />
+                            </button>
+                          </div>
+
+                          <div className="mt-3 grid grid-cols-7 text-center">
+                            {[
+                              "Sun",
+                              "Mon",
+                              "Tue",
+                              "Wed",
+                              "Thu",
+                              "Fri",
+                              "Sat",
+                            ].map((day) => (
+                              <span
+                                key={day}
+                                className="py-2 text-[10px] font-medium text-foreground-secondary"
+                              >
+                                {day}
+                              </span>
+                            ))}
+
+                            {getCalendarDays(
+                              calendarDate.getFullYear(),
+                              calendarDate.getMonth(),
+                            ).map(
+                              (
+                                {
+                                  date,
+                                  currentMonth,
+                                },
+                                index,
+                              ) => {
+                                const selectedDate =
+                                  dueDate
+                                    ? new Date(
+                                      `${toInputDate(
+                                        dueDate,
+                                      )}T00:00:00`,
+                                    )
+                                    : null;
+
+                                const isSelected =
+                                  selectedDate &&
+                                  isSameDate(
+                                    date,
+                                    selectedDate,
+                                  );
+
+                                const isToday =
+                                  isSameDate(
+                                    date,
+                                    new Date(),
+                                  );
+
+                                return (
+                                  <button
+                                    key={`${date.toISOString()}-${index}`}
+                                    type="button"
+                                    onClick={() => {
+                                      const selected =
+                                        `${date.getFullYear()}-${String(
+                                          date.getMonth() + 1,
+                                        ).padStart(
+                                          2,
+                                          "0",
+                                        )}-${String(
+                                          date.getDate(),
+                                        ).padStart(
+                                          2,
+                                          "0",
+                                        )}`;
+
+                                      updateField(() =>
+                                        setDueDate(
+                                          selected,
+                                        ),
+                                      );
+
+                                      setManualDueDate(
+                                        formatManualDate(
+                                          selected,
+                                        ),
+                                      );
+
+                                      setDueDateError(
+                                        "",
+                                      );
+                                    }}
+                                    className={`mx-auto flex h-8 w-8 items-center justify-center rounded-md text-xs transition-colors ${!currentMonth
+                                      ? "text-foreground-secondary opacity-40"
+                                      : "text-foreground"
+                                      } ${isSelected
+                                        ? "bg-primary text-white"
+                                        : "hover:bg-surface-secondary"
+                                      } ${isToday &&
+                                        !isSelected
+                                        ? "border border-primary"
+                                        : ""
+                                      }`}
+                                  >
+                                    {date.getDate()}
+                                  </button>
+                                );
+                              },
+                            )}
+                          </div>
+
+                          <div className="mt-4 border-t border-border pt-3">
+                            <label className="mb-1.5 block text-xs text-foreground-secondary">
+                              Enter date manually
+                            </label>
+
+                            <input
+                              type="text"
+                              value={manualDueDate}
+                              onChange={(event) => {
+                                setManualDueDate(
+                                  event.target.value,
+                                );
+
+                                setDueDateError(
+                                  "",
+                                );
+                              }}
+                              onBlur={() => {
+                                if (
+                                  !manualDueDate.trim()
+                                ) {
+                                  return;
+                                }
+
+                                const parsedDate =
+                                  parseManualDate(
+                                    manualDueDate,
+                                  );
+
+                                if (!parsedDate) {
+                                  setDueDateError(
+                                    "Use DD/MM/YYYY",
+                                  );
+
+                                  return;
+                                }
+
+                                updateField(() =>
+                                  setDueDate(
+                                    parsedDate,
+                                  ),
+                                );
+
+                                setCalendarDate(
+                                  new Date(
+                                    `${parsedDate}T00:00:00`,
+                                  ),
+                                );
+
+                                setManualDueDate(
+                                  formatManualDate(
+                                    parsedDate,
+                                  ),
+                                );
+                              }}
+                              placeholder="DD/MM/YYYY"
+                              className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-primary"
+                            />
+
+                            {dueDateError && (
+                              <p className="mt-1 text-xs text-red-500">
+                                {dueDateError}
+                              </p>
+                            )}
+                          </div>
+
+                          <div className="mt-3 flex gap-2">
+                            <button
+                              type="button"
+                              onClick={() => {
+                                const parsedDate =
+                                  manualDueDate.trim()
+                                    ? parseManualDate(
                                       manualDueDate,
-                                    );
+                                    )
+                                    : dueDate;
 
-                                  if (!parsedDate) {
-                                    setDueDateError(
-                                      "Use DD/MM/YYYY",
-                                    );
+                                if (
+                                  manualDueDate.trim() &&
+                                  !parsedDate
+                                ) {
+                                  setDueDateError(
+                                    "Use DD/MM/YYYY",
+                                  );
 
-                                    return;
-                                  }
+                                  return;
+                                }
 
+                                if (parsedDate) {
                                   updateField(() =>
                                     setDueDate(
                                       parsedDate,
@@ -3171,103 +3217,50 @@ export default function TaskDetailsPage() {
                                       parsedDate,
                                     ),
                                   );
-                                }}
-                                placeholder="DD/MM/YYYY"
-                                className="h-9 w-full rounded-md border border-border bg-background px-3 text-sm text-foreground outline-none focus:border-primary"
-                              />
+                                }
 
-                              {dueDateError && (
-                                <p className="mt-1 text-xs text-red-500">
-                                  {dueDateError}
-                                </p>
-                              )}
-                            </div>
+                                setShowDueDateMenu(
+                                  false,
+                                );
+                              }}
+                              className="h-9 flex-1 rounded-md bg-foreground text-sm font-medium text-background"
+                            >
+                              Apply
+                            </button>
 
-                            <div className="mt-3 flex gap-2">
+                            {dueDate && (
                               <button
                                 type="button"
                                 onClick={() => {
-                                  const parsedDate =
-                                    manualDueDate.trim()
-                                      ? parseManualDate(
-                                        manualDueDate,
-                                      )
-                                      : dueDate;
+                                  updateField(() =>
+                                    setDueDate(
+                                      null,
+                                    ),
+                                  );
 
-                                  if (
-                                    manualDueDate.trim() &&
-                                    !parsedDate
-                                  ) {
-                                    setDueDateError(
-                                      "Use DD/MM/YYYY",
-                                    );
+                                  setManualDueDate(
+                                    "",
+                                  );
 
-                                    return;
-                                  }
-
-                                  if (parsedDate) {
-                                    updateField(() =>
-                                      setDueDate(
-                                        parsedDate,
-                                      ),
-                                    );
-
-                                    setCalendarDate(
-                                      new Date(
-                                        `${parsedDate}T00:00:00`,
-                                      ),
-                                    );
-
-                                    setManualDueDate(
-                                      formatManualDate(
-                                        parsedDate,
-                                      ),
-                                    );
-                                  }
+                                  setDueDateError(
+                                    "",
+                                  );
 
                                   setShowDueDateMenu(
                                     false,
                                   );
                                 }}
-                                className="h-9 flex-1 rounded-md bg-foreground text-sm font-medium text-background"
+                                className="h-9 rounded-md px-3 text-xs text-red-500 hover:bg-surface-secondary"
                               >
-                                Apply
+                                Clear
                               </button>
-
-                              {dueDate && (
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    updateField(() =>
-                                      setDueDate(
-                                        null,
-                                      ),
-                                    );
-
-                                    setManualDueDate(
-                                      "",
-                                    );
-
-                                    setDueDateError(
-                                      "",
-                                    );
-
-                                    setShowDueDateMenu(
-                                      false,
-                                    );
-                                  }}
-                                  className="h-9 rounded-md px-3 text-xs text-red-500 hover:bg-surface-secondary"
-                                >
-                                  Clear
-                                </button>
-                              )}
-                            </div>
+                            )}
                           </div>
-                        )}
-                      </div>
+                        </div>
+                      )}
                     </div>
                   </div>
-                </div>
+                )}
               </section>
 
               <section className="mt-5 rounded-lg border border-border bg-surface p-3 shadow-sm">
@@ -3293,35 +3286,28 @@ export default function TaskDetailsPage() {
                   Updates
                 </button>
 
-                <div
-                  className={`grid transition-[grid-template-rows,opacity] duration-500 ease-in-out ${showUpdates
-                    ? "grid-rows-[1fr] opacity-100"
-                    : "grid-rows-[0fr] opacity-0"
-                    }`}
-                >
-                  <div className="min-h-0 overflow-hidden">
-                    <div className="mt-5">
-                      <div className="flex gap-3">
-                        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-red-500/10">
-                          <SignalHigh
-                            size={14}
-                            className="text-red-500"
-                          />
-                        </div>
+                {showUpdates && (
+                  <div className="mt-5">
+                    <div className="flex gap-3">
+                      <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-red-500/10">
+                        <SignalHigh
+                          size={14}
+                          className="text-red-500"
+                        />
+                      </div>
 
-                        <div>
-                          <p className="text-sm font-medium text-foreground">
-                            Task
-                          </p>
+                      <div>
+                        <p className="text-sm font-medium text-foreground">
+                          Task
+                        </p>
 
-                          <p className="mt-1 text-xs text-foreground-secondary">
-                            Task details are ready to edit
-                          </p>
-                        </div>
+                        <p className="mt-1 text-xs text-foreground-secondary">
+                          Task details are ready to edit
+                        </p>
                       </div>
                     </div>
                   </div>
-                </div>
+                )}
               </section>
             </aside>
           </div>
