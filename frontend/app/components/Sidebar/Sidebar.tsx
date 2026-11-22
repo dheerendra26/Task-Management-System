@@ -245,7 +245,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                 className="flex h-9 w-full items-center gap-2 rounded-md px-3 py-2 text-left transition-colors hover:bg-surface-secondary"
               >
                 <div
-                  className="h-4 w-4 shrink-0 rounded-xs"
+                  className="h-4 w-4 shrink-0 rounded-xs border border-border"
                   style={{
                     backgroundColor:
                       colorModes.find((item) => item.name === colorMode)
@@ -342,7 +342,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                     className="flex h-9 w-full items-center gap-2 rounded-2xl px-3 py-2 transition-colors hover:bg-surface-secondary"
                   >
                     <div
-                      className="h-4 w-4 shrink-0 rounded-xs"
+                      className="h-4 w-4 shrink-0 rounded-xs border border-border"
                       style={{
                         backgroundColor:
                           colorModes.find((item) => item.name === colorMode)
@@ -544,7 +544,7 @@ export default function Sidebar({ isOpen, onClose }: SidebarProps) {
                     }`}
                 >
                   <span
-                    className="h-4 w-4 shrink-0 rounded-xs"
+                    className="h-4 w-4 shrink-0 rounded-xs border border-border"
                     style={{
                       backgroundColor: item.color,
                     }}

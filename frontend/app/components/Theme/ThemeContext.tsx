@@ -28,15 +28,6 @@ type ThemeContextType = {
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-const colorModes: Record<ColorMode, string> = {
-  Amber: "#D97706",
-  Blue: "#9333EA",
-  Pink: "#DB2777",
-  Rose: "#E11D48",
-  Emerald: "#059669",
-  Black: "#171717",
-};
-
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [theme, setThemeState] = useState<Theme>("light");
   const [colorMode, setColorModeState] = useState<ColorMode>("Black");
@@ -56,14 +47,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
       root.setAttribute("data-theme", resolvedTheme);
       root.setAttribute("data-color", selectedColor);
-      root.style.setProperty("--accent-color", colorModes[selectedColor]);
     },
     [],
   );
 
   useEffect(() => {
     const savedTheme = localStorage.getItem("theme") as Theme | null;
-
     const savedColor = localStorage.getItem("colorMode") as ColorMode | null;
 
     const initialTheme = savedTheme || "light";
